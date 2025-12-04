@@ -163,6 +163,23 @@ function bindEvents() {
         });
     });
 
+    // Settings tabs
+    document.querySelectorAll('.settings-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.dataset.settingsTab;
+
+            // Update active tab button
+            document.querySelectorAll('.settings-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.settingsTab === targetTab);
+            });
+
+            // Update active tab content
+            document.querySelectorAll('.settings-tab-content').forEach(content => {
+                content.classList.toggle('active', content.dataset.settingsContent === targetTab);
+            });
+        });
+    });
+
     // Initialize provider UI based on current settings
     initProviderUI();
 }

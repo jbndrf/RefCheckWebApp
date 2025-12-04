@@ -26,16 +26,17 @@
                     <button class="modal-close" id="settings-close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <!-- LLM Provider Card - Most important, expanded by default -->
-                    <div class="settings-card expanded" data-card="llm-provider">
-                        <div class="settings-card-header">
-                            <div class="settings-card-title">
-                                <h3>LLM Provider</h3>
-                                <span class="card-subtitle">Required for processing</span>
-                            </div>
-                            <span class="settings-card-toggle">&#9660;</span>
-                        </div>
-                        <div class="settings-card-body">
+                    <!-- Settings Tabs Navigation -->
+                    <div class="settings-tabs">
+                        <button class="settings-tab active" data-settings-tab="llm-provider">LLM Provider</button>
+                        <button class="settings-tab" data-settings-tab="windowing">Window Settings</button>
+                        <button class="settings-tab" data-settings-tab="validation">Validation</button>
+                        <button class="settings-tab" data-settings-tab="prompt">Extraction Prompt</button>
+                    </div>
+
+                    <!-- LLM Provider Tab -->
+                    <div class="settings-tab-content active" data-settings-content="llm-provider">
+                        <div class="settings-section">
                             <!-- Critical Privacy Warning -->
                             <div class="info-box critical">
                                 <p><strong>Important: Your text is sent to an external service.</strong></p>
@@ -155,16 +156,9 @@
                         </div>
                     </div>
 
-                    <!-- Window Settings Card -->
-                    <div class="settings-card" data-card="windowing">
-                        <div class="settings-card-header">
-                            <div class="settings-card-title">
-                                <h3>Window Settings</h3>
-                                <span class="card-subtitle">How text is split for processing</span>
-                            </div>
-                            <span class="settings-card-toggle">&#9660;</span>
-                        </div>
-                        <div class="settings-card-body">
+                    <!-- Window Settings Tab -->
+                    <div class="settings-tab-content" data-settings-content="windowing">
+                        <div class="settings-section">
                             <div class="setting-row">
                                 <label for="window-size">Window size (characters) <span class="recommended">2000 recommended</span></label>
                                 <input type="number" id="window-size" value="2000" min="500" max="10000" step="100">
@@ -184,68 +178,66 @@
                                 </div>
                                 <div class="collapsible-content">
                                     <div class="info-box">
-                                        <p><strong>This approach allows almost any bibliography format to be analyzed reliably.</strong> By splitting text into smaller chunks, even fast/cheap LLMs can extract citations accurately without getting confused by long documents.</p>
-                                        <p><strong>Why it works:</strong></p>
+                                        <p><strong>Trade-offs:</strong></p>
                                         <ul>
-                                            <li>LLMs perform better with focused, smaller inputs</li>
-                                            <li>Less text means fewer errors and hallucinations</li>
-                                            <li>Overlapping windows ensure citations at boundaries are captured</li>
-                                            <li>Works regardless of citation style (APA, MLA, Vancouver, etc.)</li>
+                                            <li><strong>Smaller windows</strong> = more API requests (hitting rate limits faster), but less text means fewer extraction errors</li>
+                                            <li><strong>Too small</strong> = overlapping citations become hard to differentiate and merge correctly</li>
+                                            <li><strong>Recommended:</strong> 2000 characters with 200 character overlap works well for most bibliographies</li>
                                         </ul>
                                     </div>
 
                                     <!-- SVG Illustration -->
                                     <div class="illustration-container">
-                                        <svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg">
-                                            <!-- Background text representation -->
-                                            <rect x="20" y="20" width="460" height="30" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
-                                            <text x="30" y="40" font-family="monospace" font-size="10" fill="#64748b">Smith, J. (2020). First citation title. Journal A, 1(1), 1-10.</text>
+                                        <svg viewBox="0 0 520 140" xmlns="http://www.w3.org/2000/svg">
+                                            <!-- Title -->
+                                            <text x="10" y="20" font-family="sans-serif" font-size="11" fill="#64748b" font-weight="600">Bibliography text is split into overlapping chunks:</text>
 
-                                            <rect x="20" y="55" width="460" height="30" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
-                                            <text x="30" y="75" font-family="monospace" font-size="10" fill="#64748b">Jones, M. (2021). Second reference here. Journal B, 2(3), 45-67.</text>
+                                            <!-- Citation boxes -->
+                                            <rect x="10" y="35" width="90" height="28" rx="4" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="1"/>
+                                            <text x="25" y="53" font-family="sans-serif" font-size="9" fill="#0c4a6e">Citation 1</text>
 
-                                            <rect x="20" y="90" width="460" height="30" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
-                                            <text x="30" y="110" font-family="monospace" font-size="10" fill="#64748b">Brown, A. (2019). Third article title. Journal C, 5(2), 100-120.</text>
+                                            <rect x="105" y="35" width="90" height="28" rx="4" fill="#ddd6fe" stroke="#8b5cf6" stroke-width="1"/>
+                                            <text x="120" y="53" font-family="sans-serif" font-size="9" fill="#5b21b6">Citation 2</text>
 
-                                            <!-- Window 1 overlay -->
-                                            <rect x="18" y="18" width="280" height="69" rx="6" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="2"/>
-                                            <rect x="18" y="14" width="70" height="14" rx="3" fill="#3b82f6"/>
-                                            <text x="24" y="24" font-family="sans-serif" font-size="9" fill="white" font-weight="600">Window 1</text>
+                                            <rect x="200" y="35" width="90" height="28" rx="4" fill="#fef3c7" stroke="#f59e0b" stroke-width="1"/>
+                                            <text x="215" y="53" font-family="sans-serif" font-size="9" fill="#92400e">Citation 3</text>
 
-                                            <!-- Overlap indicator -->
-                                            <rect x="220" y="53" width="80" height="34" rx="4" fill="rgba(139, 92, 246, 0.2)" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4,2"/>
+                                            <rect x="295" y="35" width="90" height="28" rx="4" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+                                            <text x="310" y="53" font-family="sans-serif" font-size="9" fill="#065f46">Citation 4</text>
 
-                                            <!-- Window 2 overlay -->
-                                            <rect x="218" y="53" width="264" height="69" rx="6" fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="2"/>
-                                            <rect x="218" y="49" width="70" height="14" rx="3" fill="#10b981"/>
-                                            <text x="224" y="59" font-family="sans-serif" font-size="9" fill="white" font-weight="600">Window 2</text>
+                                            <rect x="390" y="35" width="90" height="28" rx="4" fill="#fecdd3" stroke="#f43f5e" stroke-width="1"/>
+                                            <text x="405" y="53" font-family="sans-serif" font-size="9" fill="#881337">Citation 5</text>
 
-                                            <!-- Legend -->
-                                            <rect x="20" y="140" width="12" height="12" rx="2" fill="rgba(59, 130, 246, 0.3)" stroke="#3b82f6"/>
-                                            <text x="38" y="150" font-family="sans-serif" font-size="10" fill="#64748b">Window chunk</text>
+                                            <!-- Window 1 -->
+                                            <rect x="10" y="85" width="180" height="24" rx="3" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="2"/>
+                                            <text x="70" y="101" font-family="sans-serif" font-size="9" fill="#1e40af" font-weight="600">Window 1</text>
 
-                                            <rect x="140" y="140" width="12" height="12" rx="2" fill="rgba(139, 92, 246, 0.3)" stroke="#8b5cf6" stroke-dasharray="2,1"/>
-                                            <text x="158" y="150" font-family="sans-serif" font-size="10" fill="#64748b">Overlap region</text>
+                                            <!-- Overlap 1-2 -->
+                                            <rect x="140" y="85" width="50" height="24" rx="3" fill="rgba(139, 92, 246, 0.3)" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="4,2"/>
+                                            <text x="145" y="77" font-family="sans-serif" font-size="7" fill="#7c3aed" font-weight="600">overlap</text>
 
-                                            <text x="280" y="150" font-family="sans-serif" font-size="10" fill="#64748b">(prevents split citations)</text>
+                                            <!-- Window 2 -->
+                                            <rect x="140" y="85" width="180" height="24" rx="3" fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="2"/>
+                                            <text x="200" y="101" font-family="sans-serif" font-size="9" fill="#047857" font-weight="600">Window 2</text>
+
+                                            <!-- Overlap 2-3 -->
+                                            <rect x="270" y="85" width="50" height="24" rx="3" fill="rgba(139, 92, 246, 0.3)" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="4,2"/>
+                                            <text x="275" y="77" font-family="sans-serif" font-size="7" fill="#7c3aed" font-weight="600">overlap</text>
+
+                                            <!-- Window 3 -->
+                                            <rect x="270" y="85" width="180" height="24" rx="3" fill="rgba(236, 72, 153, 0.15)" stroke="#ec4899" stroke-width="2"/>
+                                            <text x="330" y="101" font-family="sans-serif" font-size="9" fill="#9f1239" font-weight="600">Window 3</text>
                                         </svg>
-                                        <p class="illustration-caption">Text is split into overlapping windows, each processed separately by the LLM</p>
+                                        <p class="illustration-caption">Each window overlaps with the next, ensuring no citation is split</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Validation & Email Card -->
-                    <div class="settings-card" data-card="validation">
-                        <div class="settings-card-header">
-                            <div class="settings-card-title">
-                                <h3>Validation Settings</h3>
-                                <span class="card-subtitle">Citation verification options</span>
-                            </div>
-                            <span class="settings-card-toggle">&#9660;</span>
-                        </div>
-                        <div class="settings-card-body">
+                    <!-- Validation Tab -->
+                    <div class="settings-tab-content" data-settings-content="validation">
+                        <div class="settings-section">
                             <div class="setting-row">
                                 <label for="user-email">Your Email (optional)</label>
                                 <input type="email" id="user-email" placeholder="you@example.com">
@@ -266,23 +258,16 @@
                                 <div class="collapsible-content">
                                     <div class="info-box">
                                         <p>After extracting citations, this app validates them against CrossRef and OpenAlex databases. This helps identify whether the extracted information is accurate.</p>
-                                        <p><strong>Email (optional):</strong> These services are free to use. Providing your email helps them understand who uses their APIs and may grant you higher rate limits. This is not required and does not affect functionality.</p>
+                                        <p><strong>Email (optional but recommended):</strong> Providing your email may grant you higher rate limits. Without it, you might get rate limited and validation requests could fail. Not a big deal, but suggested.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Extraction Prompt Card -->
-                    <div class="settings-card" data-card="prompt">
-                        <div class="settings-card-header">
-                            <div class="settings-card-title">
-                                <h3>Extraction Prompt</h3>
-                                <span class="card-subtitle">Advanced - usually no changes needed</span>
-                            </div>
-                            <span class="settings-card-toggle">&#9660;</span>
-                        </div>
-                        <div class="settings-card-body">
+                    <!-- Extraction Prompt Tab -->
+                    <div class="settings-tab-content" data-settings-content="prompt">
+                        <div class="settings-section">
                             <div class="setting-row">
                                 <label for="extraction-prompt">System Prompt</label>
                                 <textarea id="extraction-prompt" rows="12"></textarea>
