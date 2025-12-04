@@ -45,7 +45,7 @@ Don't be intimidated if you're non-technical. Getting an API key is straightforw
 
 ## **Using the app**
 
-1. : Just visit https://janbndrf.github.io/RefCheckWebApp
+1. : Just visit https://jbndrf.github.io/RefCheckWebApp
 
   
 
