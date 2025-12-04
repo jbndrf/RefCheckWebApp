@@ -21,9 +21,9 @@ This is especially usefull to identify AI-generated non valid citations, which a
 
 
 
-## Screenshot
+## Demo
 
-![RefCheckWebApp Interface](docs/Screenshot%20From%202025-12-04%2017-18-25.png)
+![RefCheckWebApp Demo](docs/Kooha-2025-12-04-17-47-54.gif)
 
 
 ## Quick Setup for Analysis
