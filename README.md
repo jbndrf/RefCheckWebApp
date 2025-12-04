@@ -7,7 +7,7 @@
 
   
 
-**Disclaimer:** This is a low-effort vibecoded webapp that started as a quick proof-of-concept to solve a personal problem. It eventually turned out to be useful enough that it might help other people too.
+**Disclaimer:** This is a low-effort vibecoded webapp that was supposed to solve a personal problem. It eventually turned out to be useful enough that it might help others too.
 
   
 
