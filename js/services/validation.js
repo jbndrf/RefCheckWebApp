@@ -9,14 +9,16 @@ import { stringSimilarity } from '../utils/similarity.js';
 /**
  * Field weights for match scoring
  * Higher weights = more important for determining if citations match
+ * Core fields (title, authors, year) heavily weighted - they determine validity
+ * Secondary fields (journal, volume, pages) have minimal impact
  */
 const FIELD_WEIGHTS = {
-    title: 3.0,        // Title is most important
-    authors: 2.0,      // Authors are very important
-    year: 1.5,         // Year is important
-    journal: 1.0,      // Journal name
-    volume: 0.5,       // Volume number
-    pages: 0.5,        // Page numbers
+    title: 10.0,       // Title is critical
+    authors: 8.0,      // Authors are critical
+    year: 6.0,         // Year is very important
+    journal: 0.5,      // Journal name (helpful but not critical, often abbreviated)
+    volume: 0.2,       // Volume number (minor detail)
+    pages: 0.2,        // Page numbers (minor detail)
     doi: 1.0,          // DOI match (when comparing against search results)
 };
 
@@ -24,8 +26,8 @@ const FIELD_WEIGHTS = {
  * Thresholds for validation status
  */
 const THRESHOLDS = {
-    valid: 0.7,        // Above this = valid match
-    suspicious: 0.4,   // Between suspicious and valid = needs review
+    valid: 0.90,       // Above this = valid match (strict: valid refs have ~95% overlap)
+    suspicious: 0.70,  // Between suspicious and valid = needs review
     // Below suspicious = mismatch
 };
 
