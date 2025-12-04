@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RefCheckWebApp - Bibliography Extraction & Validation</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Menu -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1>RefCheckWebApp</h1>
+            </div>
+            <nav class="header-nav">
+                <button class="nav-btn" id="settings-btn">Settings</button>
+            </nav>
+        </header>
+
+        <!-- Settings Modal -->
+        <div class="modal-overlay" id="settings-modal">
+            <div class="modal modal-lg">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="modal-close" id="settings-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- LLM Provider Card - Most important, expanded by default -->
+                    <div class="settings-card expanded" data-card="llm-provider">
+                        <div class="settings-card-header">
+                            <div class="settings-card-title">
+                                <h3>LLM Provider</h3>
+                                <span class="card-subtitle">Required for processing</span>
+                            </div>
+                            <span class="settings-card-toggle">&#9660;</span>
+                        </div>
+                        <div class="settings-card-body">
+                            <!-- Critical Privacy Warning -->
+                            <div class="info-box critical">
+                                <p><strong>Important: Your text is sent to an external service.</strong></p>
+                                <p>This application runs locally in your browser, but the citation extraction requires sending your bibliography text to the LLM provider you select below. For example, if you choose Google AI Studio, all the text you paste will be transmitted to Google's servers for processing.</p>
+                                <p><strong>Do not paste text containing personal information, confidential data, or sensitive material.</strong> Standard bibliographic references (author names, titles, journal names, DOIs, etc.) are fine to process.</p>
+                            </div>
+
+                            <div class="provider-choice">
+                                <div class="provider-option" data-provider="google">
+                                    <h5>Google AI Studio <span class="badge recommended">Recommended</span></h5>
+                                    <p>Free tier available with rate limits. Easy setup.</p>
+                                </div>
+                                <div class="provider-option" data-provider="openai">
+                                    <h5>OpenAI Compatible <span class="badge advanced">Advanced</span></h5>
+                                    <p>Any OpenAI-compatible endpoint (OpenAI, local, etc.)</p>
+                                </div>
+                            </div>
+
+                            <!-- Google Setup Guide - Collapsible -->
+                            <div id="google-setup-guide">
+                                <div class="collapsible-explanation" data-collapsible="google-guide">
+                                    <div class="collapsible-header">
+                                        <span>How to set up Google AI Studio</span>
+                                        <span class="collapsible-toggle">&#9660;</span>
+                                    </div>
+                                    <div class="collapsible-content">
+                                        <div class="info-box">
+                                            <p>Google provides free access to several AI models with generous rate limits. The <strong>Gemini 2.5 Flash Lite</strong> model is recommended for fast, accurate citation extraction.</p>
+                                        </div>
+                                        <ol class="setup-steps">
+                                            <li class="setup-step">
+                                                <h4>Get an API Key</h4>
+                                                <p>Visit <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a> and sign in with your Google account. Click "Create API Key" and copy it.</p>
+                                            </li>
+                                            <li class="setup-step">
+                                                <h4>Paste Your API Key</h4>
+                                                <p>Enter your API key in the field below. It will be stored locally in your browser only.</p>
+                                            </li>
+                                            <li class="setup-step">
+                                                <h4>Select a Model</h4>
+                                                <p>Click "Refresh" to load available models, then select one. <code>gemini-2.5-flash-lite</code> is recommended.</p>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- OpenAI Setup Info - Collapsible -->
+                            <div id="openai-setup-guide" style="display: none;">
+                                <div class="collapsible-explanation" data-collapsible="openai-guide">
+                                    <div class="collapsible-header">
+                                        <span>How to set up an OpenAI-compatible endpoint</span>
+                                        <span class="collapsible-toggle">&#9660;</span>
+                                    </div>
+                                    <div class="collapsible-content">
+                                        <div class="info-box">
+                                            <p>Use this option if you have your own OpenAI API key, or want to connect to a compatible endpoint like Ollama, LM Studio, or other local/self-hosted LLMs.</p>
+                                            <p>For local endpoints, your data stays on your machine and is not sent to any external service.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="setting-row" style="display: none;">
+                                <label for="llm-provider">Provider</label>
+                                <select id="llm-provider">
+                                    <option value="openai">OpenAI Compatible</option>
+                                    <option value="google">Google AI Studio</option>
+                                </select>
+                            </div>
+                            <div class="setting-row">
+                                <label for="llm-endpoint">Endpoint URL</label>
+                                <input type="url" id="llm-endpoint" placeholder="https://generativelanguage.googleapis.com/v1beta">
+                            </div>
+                            <div class="setting-row">
+                                <label for="llm-api-key">API Key</label>
+                                <input type="password" id="llm-api-key" placeholder="Enter your API key">
+                            </div>
+
+                            <!-- API Key Security Info -->
+                            <div class="collapsible-explanation" data-collapsible="api-key-info">
+                                <div class="collapsible-header">
+                                    <span>About your API key (important)</span>
+                                    <span class="collapsible-toggle">&#9660;</span>
+                                </div>
+                                <div class="collapsible-content">
+                                    <div class="info-box warning">
+                                        <p><strong>Your API key stays on your device.</strong> This application stores all settings locally in your browser. Nothing is sent to me (the developer of this app). I do not have access to your API key or any of your data.</p>
+                                        <p><strong>However, you should still be careful:</strong></p>
+                                        <ul>
+                                            <li>Never share your API key with anyone</li>
+                                            <li>Do not trust anyone who asks for it - including me</li>
+                                            <li>API keys can make requests that may cost money if leaked</li>
+                                        </ul>
+                                        <p><strong>Recommended: Keep the free tier.</strong> If you have not added a payment method to your Google AI Studio account, your key is limited to the free tier and cannot generate charges. This is the safest option.</p>
+                                        <p><strong>If you have billing enabled:</strong> Set a spending limit of 0 EUR in your Google Cloud console to prevent unexpected charges. Look for "Budget & alerts" in your billing settings.</p>
+                                        <p>With a free-tier key and no payment method, you have nothing to worry about.</p>
+                                        <p style="margin-top: 0.75rem; font-size: 0.75rem; font-style: italic;"><strong>Disclaimer:</strong> I do not take any responsibility for the correctness of these statements. Please verify billing settings and API key security practices with your provider's official documentation.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="setting-row">
+                                <label for="llm-model">Model</label>
+                                <div class="model-select-group">
+                                    <select id="llm-model">
+                                        <option value="">-- Select a model --</option>
+                                    </select>
+                                    <button class="btn btn-secondary" id="refresh-models-btn">Refresh</button>
+                                </div>
+                            </div>
+                            <div class="setting-row">
+                                <label for="max-llm-rpm">Requests per minute</label>
+                                <input type="number" id="max-llm-rpm" value="15" min="1" max="120">
+                                <span class="setting-hint">Adjust based on your provider's rate limits. Google free tier allows ~15/min.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Window Settings Card -->
+                    <div class="settings-card" data-card="windowing">
+                        <div class="settings-card-header">
+                            <div class="settings-card-title">
+                                <h3>Window Settings</h3>
+                                <span class="card-subtitle">How text is split for processing</span>
+                            </div>
+                            <span class="settings-card-toggle">&#9660;</span>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="setting-row">
+                                <label for="window-size">Window size (characters) <span class="recommended">2000 recommended</span></label>
+                                <input type="number" id="window-size" value="2000" min="500" max="10000" step="100">
+                                <span class="setting-hint">Smaller windows = more reliable extraction. Try 2000 for fast models.</span>
+                            </div>
+                            <div class="setting-row">
+                                <label for="overlap-size">Overlap (characters) <span class="recommended">200 recommended</span></label>
+                                <input type="number" id="overlap-size" value="200" min="0" max="2000" step="50">
+                                <span class="setting-hint">Overlap ensures citations at window boundaries are captured by both windows.</span>
+                            </div>
+
+                            <!-- Collapsible explanation -->
+                            <div class="collapsible-explanation" data-collapsible="windowing-explanation">
+                                <div class="collapsible-header">
+                                    <span>Why does windowing help?</span>
+                                    <span class="collapsible-toggle">&#9660;</span>
+                                </div>
+                                <div class="collapsible-content">
+                                    <div class="info-box">
+                                        <p><strong>This approach allows almost any bibliography format to be analyzed reliably.</strong> By splitting text into smaller chunks, even fast/cheap LLMs can extract citations accurately without getting confused by long documents.</p>
+                                        <p><strong>Why it works:</strong></p>
+                                        <ul>
+                                            <li>LLMs perform better with focused, smaller inputs</li>
+                                            <li>Less text means fewer errors and hallucinations</li>
+                                            <li>Overlapping windows ensure citations at boundaries are captured</li>
+                                            <li>Works regardless of citation style (APA, MLA, Vancouver, etc.)</li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- SVG Illustration -->
+                                    <div class="illustration-container">
+                                        <svg viewBox="0 0 500 180" xmlns="http://www.w3.org/2000/svg">
+                                            <!-- Background text representation -->
+                                            <rect x="20" y="20" width="460" height="30" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+                                            <text x="30" y="40" font-family="monospace" font-size="10" fill="#64748b">Smith, J. (2020). First citation title. Journal A, 1(1), 1-10.</text>
+
+                                            <rect x="20" y="55" width="460" height="30" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+                                            <text x="30" y="75" font-family="monospace" font-size="10" fill="#64748b">Jones, M. (2021). Second reference here. Journal B, 2(3), 45-67.</text>
+
+                                            <rect x="20" y="90" width="460" height="30" rx="4" fill="#f1f5f9" stroke="#e2e8f0"/>
+                                            <text x="30" y="110" font-family="monospace" font-size="10" fill="#64748b">Brown, A. (2019). Third article title. Journal C, 5(2), 100-120.</text>
+
+                                            <!-- Window 1 overlay -->
+                                            <rect x="18" y="18" width="280" height="69" rx="6" fill="rgba(59, 130, 246, 0.15)" stroke="#3b82f6" stroke-width="2"/>
+                                            <rect x="18" y="14" width="70" height="14" rx="3" fill="#3b82f6"/>
+                                            <text x="24" y="24" font-family="sans-serif" font-size="9" fill="white" font-weight="600">Window 1</text>
+
+                                            <!-- Overlap indicator -->
+                                            <rect x="220" y="53" width="80" height="34" rx="4" fill="rgba(139, 92, 246, 0.2)" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="4,2"/>
+
+                                            <!-- Window 2 overlay -->
+                                            <rect x="218" y="53" width="264" height="69" rx="6" fill="rgba(16, 185, 129, 0.15)" stroke="#10b981" stroke-width="2"/>
+                                            <rect x="218" y="49" width="70" height="14" rx="3" fill="#10b981"/>
+                                            <text x="224" y="59" font-family="sans-serif" font-size="9" fill="white" font-weight="600">Window 2</text>
+
+                                            <!-- Legend -->
+                                            <rect x="20" y="140" width="12" height="12" rx="2" fill="rgba(59, 130, 246, 0.3)" stroke="#3b82f6"/>
+                                            <text x="38" y="150" font-family="sans-serif" font-size="10" fill="#64748b">Window chunk</text>
+
+                                            <rect x="140" y="140" width="12" height="12" rx="2" fill="rgba(139, 92, 246, 0.3)" stroke="#8b5cf6" stroke-dasharray="2,1"/>
+                                            <text x="158" y="150" font-family="sans-serif" font-size="10" fill="#64748b">Overlap region</text>
+
+                                            <text x="280" y="150" font-family="sans-serif" font-size="10" fill="#64748b">(prevents split citations)</text>
+                                        </svg>
+                                        <p class="illustration-caption">Text is split into overlapping windows, each processed separately by the LLM</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Validation & Email Card -->
+                    <div class="settings-card" data-card="validation">
+                        <div class="settings-card-header">
+                            <div class="settings-card-title">
+                                <h3>Validation Settings</h3>
+                                <span class="card-subtitle">Citation verification options</span>
+                            </div>
+                            <span class="settings-card-toggle">&#9660;</span>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="setting-row">
+                                <label for="user-email">Your Email (optional)</label>
+                                <input type="email" id="user-email" placeholder="you@example.com">
+                                <span class="setting-hint">Shared with CrossRef/OpenAlex for validation lookups</span>
+                            </div>
+                            <div class="setting-row">
+                                <label for="max-validation-rpm">Validation requests per minute</label>
+                                <input type="number" id="max-validation-rpm" value="50" min="10" max="500">
+                                <span class="setting-hint">Rate limit for CrossRef/OpenAlex API calls</span>
+                            </div>
+
+                            <!-- Collapsible explanation -->
+                            <div class="collapsible-explanation" data-collapsible="validation-explanation">
+                                <div class="collapsible-header">
+                                    <span>What is validation?</span>
+                                    <span class="collapsible-toggle">&#9660;</span>
+                                </div>
+                                <div class="collapsible-content">
+                                    <div class="info-box">
+                                        <p>After extracting citations, this app validates them against CrossRef and OpenAlex databases. This helps identify whether the extracted information is accurate.</p>
+                                        <p><strong>Email (optional):</strong> These services are free to use. Providing your email helps them understand who uses their APIs and may grant you higher rate limits. This is not required and does not affect functionality.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Extraction Prompt Card -->
+                    <div class="settings-card" data-card="prompt">
+                        <div class="settings-card-header">
+                            <div class="settings-card-title">
+                                <h3>Extraction Prompt</h3>
+                                <span class="card-subtitle">Advanced - usually no changes needed</span>
+                            </div>
+                            <span class="settings-card-toggle">&#9660;</span>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="setting-row">
+                                <label for="extraction-prompt">System Prompt</label>
+                                <textarea id="extraction-prompt" rows="12"></textarea>
+                            </div>
+                            <button class="btn btn-secondary" id="reset-prompt-btn">Reset to Default</button>
+
+                            <!-- Collapsible explanation -->
+                            <div class="collapsible-explanation" data-collapsible="prompt-explanation">
+                                <div class="collapsible-header">
+                                    <span>About the extraction prompt</span>
+                                    <span class="collapsible-toggle">&#9660;</span>
+                                </div>
+                                <div class="collapsible-content">
+                                    <div class="info-box">
+                                        <p>The default prompt has been tuned for accurate citation extraction. You generally do not need to modify it.</p>
+                                        <p>Feel free to experiment if you want different output or have specific requirements. Use "Reset to Default" to restore the original prompt.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="settings-save">Save Settings</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Bar -->
+        <div class="info-bar">
+            <div id="stats-display" class="stats-display"></div>
+            <div class="info-bar-actions">
+                <button id="process-btn" class="btn btn-primary" disabled>Process Windows</button>
+                <button id="clear-btn" class="btn btn-secondary">Clear</button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progress-container" style="display: none;">
+            <div class="progress-header">
+                <span id="progress-text">Processing...</span>
+                <button class="btn btn-secondary btn-sm" id="cancel-btn">Cancel</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div class="progress-details" id="progress-details"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Input Panel -->
+            <div class="panel input-panel">
+                <div class="panel-header">
+                    <h2>Bibliography Input</h2>
+                    <button class="btn btn-secondary btn-sm" id="edit-input-btn" style="display: none;">Edit</button>
+                </div>
+                <div class="panel-content">
+                    <textarea
+                        id="bibliography-input"
+                        placeholder="Paste your bibliography text here..."
+                    ></textarea>
+                    <div id="markers-display" class="markers-display">
+                        <span class="placeholder">Processed text with markers will appear here...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel with Tabs -->
+            <div class="panel tabbed-panel">
+                <div class="panel-header panel-header-tabs">
+                    <div class="panel-tabs">
+                        <button class="panel-tab active" data-tab="windows">Windows</button>
+                        <button class="panel-tab" data-tab="extractions">Extractions <span id="extraction-count" class="extraction-count"></span></button>
+                    </div>
+                    <div class="panel-actions">
+                        <div class="stats-pie" id="stats-pie"></div>
+                        <select class="filter-select" id="filter-select">
+                            <option value="all">All</option>
+                            <option value="verified">Verified</option>
+                            <option value="unverified">Unverified</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" id="collapse-all-btn" disabled>Collapse All</button>
+                    </div>
+                </div>
+                <div class="panel-content">
+                    <!-- Windows Tab Content -->
+                    <div id="windows-tab-content" class="tab-content active">
+                        <div id="text-display" class="text-display">
+                            <span class="placeholder">Windows will be highlighted here...</span>
+                        </div>
+                    </div>
+                    <!-- Extractions Tab Content -->
+                    <div id="extractions-tab-content" class="tab-content">
+                        <div id="extractions-display" class="extractions-display">
+                            <span class="placeholder">Extractions will appear here after processing...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/windowing.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
