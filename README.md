@@ -25,9 +25,6 @@ This is especially usefull to identify AI-generated non valid citations, which a
 
 ![RefCheckWebApp Interface](docs/Screenshot%20From%202025-12-04%2017-18-25.png)
 
-The app interface showing bibliography input on the left and extraction results with validation status on the right. Citations are automatically validated against CrossRef and OpenAlex databases.
-
-
 
 ## Quick Setup for Analysis
 
